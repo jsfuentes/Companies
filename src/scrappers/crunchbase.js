@@ -20,6 +20,10 @@ module.exports = class Crunchbase {
     this.page.setDefaultNavigationTimeout(60000); //increase timeout to 1 minutes
   }
 
+  async close() {
+    await this.browser.close();
+  }
+
   async scrape() {
     await this.setup();
     await this.page.goto(this.COMPANY_URL);
@@ -30,7 +34,7 @@ module.exports = class Crunchbase {
     }
 
     await utils.randomDelay();
-    this.browser.close();
+    await this.close();
 
     return this.data;
   }

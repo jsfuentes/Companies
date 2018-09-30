@@ -21,6 +21,10 @@ module.exports = class Glassdoor {
     });
   }
 
+  async close() {
+    await this.browser.close();
+  }
+
   //must be run on review page
   async login() {
     await utils.randomDelay();
@@ -46,11 +50,10 @@ module.exports = class Glassdoor {
   async scrape() {
     await this.setup();
     await this.getToReviewPage();
-    await this.login();
     await this.getRatings();
 
     await utils.randomDelay();
-    this.browser.close();
+    await this.close();
     return this.data;
   }
 
@@ -90,24 +93,27 @@ module.exports = class Glassdoor {
     await this.page.waitForSelector('.ratingNum');
     this.data['glassdoor_rating']['total'] = await this.page.evaluate(() => document.querySelector('.ratingNum').innerText);
 
-    await utils.randomDelay();
-    //click filter arrow down
-    const filterArrow = '#MainCol > div.module.filterableContents > div.eiFilter > div.noPadLt > div.hideHH.curFilters > span.gdSelect.margRtSm > p > span.arrowDown';
-    await this.page.click(filterArrow);
+    //the login and filtering is pretty shaky
+    try {
+      await this.login();
 
-    await utils.randomDelay();
-    await this.page.type('#FilterJobTitle', 'software');
+      await utils.randomDelay();
+      //click filter arrow down
+      const filterArrow = '#MainCol > div.module.filterableContents > div.eiFilter > div.noPadLt > div.hideHH.curFilters > span.gdSelect.margRtSm > p > span.arrowDown';
+      await this.page.click(filterArrow);
 
-    //unselect part-time to only have fulltime
-    await utils.randomDelay();
-    const parttimeOption = '#OccLocFilters > div.eiFilterForm.margTop > form > div:nth-child(1) > div:nth-child(3) > div > div > ul > li:nth-child(5)';
-    await this.page.click(parttimeOption);
+      await utils.randomDelay();
+      await this.page.type('#FilterJobTitle', 'software');
 
-    await utils.randomDelay();
-    const filterButton = '#FilterButtons > div.ib.applyBtn > button';
-    await this.page.click(filterButton);
+      await utils.randomDelay();
+      const filterButton = '#FilterButtons > div.ib.applyBtn > button';
+      await this.page.click(filterButton);
 
-    await this.page.waitForSelector('.ratingNum');
-    this.data['glassdoor_rating']['software'] = await this.page.evaluate(() => document.querySelector('.ratingNum').innerText);
+      await this.page.waitForSelector('.ratingNum');
+      this.data['glassdoor_rating']['software'] = await this.page.evaluate(() => document.querySelector('.ratingNum').innerText);
+    } catch(err) {
+      console.log("NOT FATAL ERROR, but couldn't get engineer specific ratings:", err);
+    }
   }
+
 }

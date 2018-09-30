@@ -26,7 +26,7 @@ module.exports = class Linkedin {
     await this.companyInfo();
 
     await utils.randomDelay();
-    this.browser.close();
+    await this.close();
     return this.data;
   }
 
@@ -43,6 +43,10 @@ module.exports = class Linkedin {
       name: this.cookie['name'],
       value: this.cookie['value'],
       "url": LINKEDIN_BASE_URL});
+  }
+
+  async close() {
+    await this.browser.close();
   }
 
   async companyInfo() {

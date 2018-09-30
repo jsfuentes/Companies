@@ -6,14 +6,17 @@ const
   MongoClient = require('mongodb').MongoClient,
   utils = require('./utils.js');
 
+const COMPANY_TOO_SMALL = [
+  "aurora",
+]
+
 const COMPANY_LIST = [
   "facebook",
-  "aurora",
   "coursera",
   "google",
   "udacity",
   "stripe",
-  // "medium",
+  "medium",
   // "affirm",
   // // "Social Capital",
   // "airbnb",
@@ -37,13 +40,17 @@ async function connectToCollection(secrets) {
 }
 
 async function getCompanyInfo(company, secrets) {
-  let linkedinData, stackData, fundingData, ratingData;
+  let linkedinData = stackData = fundingData = ratingData = {};
+  let fails = {"fails": []};
+  
+  //TODO: Add seperate fts for salary and company Info for seperate fails
   const linkedin = new Linkedin(company, secrets['linkedin']);
   try {
     linkedinData = await linkedin.scrape();
   } catch(err) {
     console.log("Error scrapping Linkedin:", err);
-    linkedinData = {};
+    fails['fails'].push("Linkedin");
+    await linkedin.setDown();
   }
 
 
@@ -52,7 +59,8 @@ async function getCompanyInfo(company, secrets) {
     stackData = await stack.scrape();
   } catch(err) {
     console.log("Error scrapping StackShare:", err);
-    stackData = {};
+    fails['fails'].push("StackShare");
+    await stack.setDown();
   }
 
   const crunchbase = new Crunchbase(company);
@@ -60,7 +68,8 @@ async function getCompanyInfo(company, secrets) {
     fundingData = await crunchbase.scrape();
   } catch(err) {
     console.log("Error scrapping Crunchbase:", err);
-    fundingData = {};
+    fails['fails'].push("Crunchbase");
+    await crunchbase.setDown();
   }
 
   const glassdoor = new Glassdoor(company, secrets['glassdoor']);
@@ -68,11 +77,13 @@ async function getCompanyInfo(company, secrets) {
     ratingData = await glassdoor.scrape();
    } catch(err) {
     console.log("Error scrapping Glassdoor:", err);
-    ratingData = {};
+    fails['fails'].push("Glassdoor");
+    await glassdoor.setDown();
   }
 
   var data = {
     "company": company,
+    ...fails,
     ...linkedinData,
     ...stackData,
     ...fundingData,

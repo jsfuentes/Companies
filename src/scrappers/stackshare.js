@@ -20,12 +20,16 @@ module.exports = class StackShare {
     });
   }
 
+  async close() {
+    await this.browser.close();
+  }
+
   async scrape() {
     await this.setup();
     await this.getStack();
 
     await utils.randomDelay();
-    this.browser.close();
+    await this.close();
     return this.data;
   }
 
