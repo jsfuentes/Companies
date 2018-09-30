@@ -33,7 +33,7 @@ module.exports = class StackShare {
     await this.page.goto(this.COMPANY_URL);
 
     await this.page.waitForSelector('.full-stack-container');
-    this.data = await this.page.evaluate(() => {
+    this.data["stack"] = await this.page.evaluate(() => {
       let data = {};
       const catDivs = document.querySelectorAll('div.stack-layer');
       for (let i = 0; i < catDivs.length; i++) {

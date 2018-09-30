@@ -42,7 +42,7 @@ module.exports = class Linkedin {
     await this.page.setCookie({
       name: this.cookie['name'],
       value: this.cookie['value'],
-      "url": "https://www.linkedin.com"});
+      "url": LINKEDIN_BASE_URL});
   }
 
   async companyInfo() {
@@ -98,6 +98,7 @@ module.exports = class Linkedin {
     });
   }
 
+  //TODO: Detect reroute cuz copmany doesnt exist, rn scrapes basic SF data
   async salary() {
     await this.page.goto(this.LINKEDIN_SALARY_URL);
 

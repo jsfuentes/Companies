@@ -6,7 +6,7 @@ module.exports = class Crunchbase {
   constructor(company) {
     this.company = company;
     this.COMPANY_URL = "https://www.crunchbase.com" + "/organization/" + company;
-    this.data = [];
+    this.data = {'funding': []};
   }
 
   async setup() {
@@ -17,6 +17,7 @@ module.exports = class Crunchbase {
       for (let i = 0; i < msg.args.length; ++i)
         console.log(`${i}: ${msg.args[i]}`);
     });
+    this.page.setDefaultNavigationTimeout(60000); //increase timeout to 1 minutes
   }
 
   async scrape() {
@@ -58,7 +59,7 @@ module.exports = class Crunchbase {
 
   async scrapeValuation(link) {
     await this.page.goto(link);
-    await utils.randomDelay();
+    await this.page.waitForSelector('.component--image-with-text-card');
 
     const curData = await this.page.evaluate(() => {
       const container = document.querySelector('#section-overview > mat-card > div.section-layout-content > fields-card > div');
@@ -86,7 +87,7 @@ module.exports = class Crunchbase {
     });
 
     if(curData !== null) {
-      this.data.push(curData);
+      this.data["funding"].push(curData);
     }
   }
 }

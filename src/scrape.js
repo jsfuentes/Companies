@@ -2,30 +2,31 @@ const
   Linkedin = require('./scrappers/linkedin.js'),
   StackShare = require('./scrappers/stackshare.js'),
   Crunchbase = require('./scrappers/crunchbase.js'),
+  Glassdoor = require('./scrappers/glassdoor.js'),
   MongoClient = require('mongodb').MongoClient,
   utils = require('./utils.js');
 
 const COMPANY_LIST = [
   "facebook",
-  "google",
+  "aurora",
   "coursera",
-  // "Aurora",
+  "google",
   "udacity",
   "stripe",
-  "medium",
-  "affirm",
-  // "Social Capital",
-  "airbnb",
-  "rubrik",
-  "databricks",
-  "plaid",
-  "quora",
-  "cruise",
-  // "Two Sigma",
-  "dropbox",
-  "slack",
-  "lemonade",
-  "robinhood"
+  // "medium",
+  // "affirm",
+  // // "Social Capital",
+  // "airbnb",
+  // "rubrik",
+  // "databricks",
+  // "plaid",
+  // "quora",
+  // "cruise",
+  // // "Two Sigma",
+  // "dropbox",
+  // "slack",
+  // "lemonade",
+  // "robinhood"
 ]
 
 async function connectToCollection(secrets) {
@@ -36,20 +37,46 @@ async function connectToCollection(secrets) {
 }
 
 async function getCompanyInfo(company, secrets) {
+  let linkedinData, stackData, fundingData, ratingData;
   const linkedin = new Linkedin(company, secrets['linkedin']);
-  const linkedinData = await linkedin.scrape();
+  try {
+    linkedinData = await linkedin.scrape();
+  } catch(err) {
+    console.log("Error scrapping Linkedin:", err);
+    linkedinData = {};
+  }
+
 
   const stack = new StackShare(company);
-  const stackData = await stack.scrape();
+  try {
+    stackData = await stack.scrape();
+  } catch(err) {
+    console.log("Error scrapping StackShare:", err);
+    stackData = {};
+  }
 
   const crunchbase = new Crunchbase(company);
-  const fundingData = await crunchbase.scrape();
+  try {
+    fundingData = await crunchbase.scrape();
+  } catch(err) {
+    console.log("Error scrapping Crunchbase:", err);
+    fundingData = {};
+  }
+
+  const glassdoor = new Glassdoor(company, secrets['glassdoor']);
+  try {
+    ratingData = await glassdoor.scrape();
+   } catch(err) {
+    console.log("Error scrapping Glassdoor:", err);
+    ratingData = {};
+  }
 
   var data = {
     "company": company,
     ...linkedinData,
-    "stack": stackData,
-    "funding": fundingData,
+    ...stackData,
+    ...fundingData,
+    ...ratingData
   };
 
   console.log(data);
@@ -73,8 +100,6 @@ async function main() {
         console.log("Failed to scrape", company, "with", err);
       }
 
-      await utils.randomDelay();
-      await utils.randomDelay();
       await utils.randomDelay();
       await utils.randomDelay();
     }
