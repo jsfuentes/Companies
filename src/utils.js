@@ -11,7 +11,7 @@ function delay(timeout) {
 
 function randomDelay() {
   return new Promise((resolve) => {
-    setTimeout(resolve, Math.floor(Math.random() * 4000));
+    setTimeout(resolve, Math.floor(Math.random() * 4000) + 777);
   });
 }
 
@@ -22,4 +22,8 @@ async function readSecrets() {
   return JSON.parse(data);
 }
 
-module.exports = {delay, randomDelay, readSecrets};
+function moneyToNumber(moneyStr) {
+  return parseInt(moneyStr.replace(/[^0-9.-]+/g, ''));
+}
+
+module.exports = {delay, randomDelay, readSecrets, moneyToNumber};
