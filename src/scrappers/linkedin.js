@@ -21,7 +21,7 @@ module.exports = class Linkedin {
 
   async scrape() {
     await this.setup();
-    // await this.salary();
+    await this.salary();
     await utils.randomDelay();
     await this.companyInfo();
 
@@ -75,8 +75,8 @@ module.exports = class Linkedin {
       table = document.querySelector('.org-function-growth-table').children[0]; //get visibly hidden table
       rows = table.querySelectorAll('tr');
 
-      var firstElement = true;
-      var data = {};
+      let firstElement = true;
+      let data = {};
       rows.forEach((row) => {
         if(firstElement) { //dont get first junk element
           firstElement = false;
@@ -85,13 +85,9 @@ module.exports = class Linkedin {
 
         const cols = row.querySelectorAll('td');
         const type = cols[0].innerText.trim();
-        const num = cols[1].innerText.trim();
+        const count = cols[1].innerText.trim();
         const percent = cols[2].innerText.trim();
-        data[type] = {
-          count: num,
-          percent: percent,
-        }
-
+        data[type] = { count, percent };
       });
 
       return data;
@@ -117,8 +113,8 @@ module.exports = class Linkedin {
     const extras = await this.page.evaluate(() => {
       names = document.querySelectorAll('.addc-CellContent__name');
       extras = document.querySelectorAll('.addc-CellContent__median__amount');
-      var data = {};
-      for (var i = 0; i < names.length; i++) {
+      let data = {};
+      for (let i = 0; i < names.length; i++) {
         data[names[i].innerText.trim()] = extras[i].innerText.trim();
       }
       return data;
