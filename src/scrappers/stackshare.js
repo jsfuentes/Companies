@@ -3,15 +3,16 @@ const
   utils = require('../utils.js');
 
 module.exports = class StackShare {
-  constructor(company) {
+  constructor(company, headless) {
     this.company = company;
     this.BASE_URL = "https://stackshare.io/"
     this.COMPANY_URL = this.BASE_URL + company + "/" + company;
     this.data = {};
+    this.headless = headless;
   }
 
   async setup() {
-    this.browser = await puppeteer.launch({headless: false});
+    this.browser = await puppeteer.launch({headless: this.headless});
     this.page = await this.browser.newPage();
     //not sure if this works actually...
     await this.page.on('console', msg => {

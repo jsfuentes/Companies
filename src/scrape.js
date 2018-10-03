@@ -3,12 +3,11 @@ const
   StackShare = require('./scrappers/stackshare.js'),
   Crunchbase = require('./scrappers/crunchbase.js'),
   Glassdoor = require('./scrappers/glassdoor.js'),
-  MongoClient = require('mongodb').MongoClient,
   utils = require('./utils.js');
 
 const COMPANY_TOO_SMALL = [
   "aurora",
-]
+];
 
 const COMPANY_LIST = [
   "facebook",
@@ -17,74 +16,90 @@ const COMPANY_LIST = [
   "udacity",
   "stripe",
   "medium",
-  // "affirm",
-  // // "Social Capital",
-  // "airbnb",
-  // "rubrik",
-  // "databricks",
-  // "plaid",
-  // "quora",
-  // "cruise",
-  // // "Two Sigma",
-  // "dropbox",
-  // "slack",
-  // "lemonade",
-  // "robinhood"
-]
+  "affirm",
+  // "Social Capital",
+  "airbnb",
+  "rubrik",
+  "databricks",
+  "plaid",
+  "quora",
+  "cruise",
+  "two-sigma-investments",
+  "lyft",
+  "uber",
+  "box",
+  "dropbox",
+  "slack",
+  "lemonade",
+  "robinhood",
+  "palantir-technologies",
+  "amazon",
+  "apple",
+  "microsoft",
+  "snap",
+  "pinterest",
+  "linkedin",
+  "twitter",
+  "paypal",
+  "square",
+  "docker",
+  "asana",
+];
 
-async function connectToCollection(secrets) {
-  const db = await MongoClient.connect(secrets['db_uri'], { useNewUrlParser: true });
-
-  const dbo = db.db("companies");
-  return dbo.collection("data");
-}
-
-async function getCompanyInfo(company, secrets) {
-  let linkedinData = stackData = fundingData = ratingData = {};
+async function getCompanyInfo(company, secrets, headless) {
+  let linkedinCompanyData = linkedinSalaryData = stackData = fundingData = ratingData = {};
   let fails = {"fails": []};
-  
+
   //TODO: Add seperate fts for salary and company Info for seperate fails
-  const linkedin = new Linkedin(company, secrets['linkedin']);
+  const linkedin = new Linkedin(company, secrets['linkedin'], headless);
   try {
-    linkedinData = await linkedin.scrape();
+    linkedinSalaryData = await linkedin.scrape(true, false);
   } catch(err) {
-    console.log("Error scrapping Linkedin:", err);
-    fails['fails'].push("Linkedin");
-    await linkedin.setDown();
+    console.log("Error scrapping Linkedin Salary:", err);
+    fails['fails'].push("Linkedin Salary");
+    await linkedin.close();
   }
 
+  try {
+    linkedinCompanyData = await linkedin.scrape(false, true);
+  } catch(err) {
+    console.log("Error scrapping Linkedin Company:", err);
+    fails['fails'].push("Linkedin Company");
+    await linkedin.close();
+  }
 
-  const stack = new StackShare(company);
+  const stack = new StackShare(company, headless);
   try {
     stackData = await stack.scrape();
   } catch(err) {
     console.log("Error scrapping StackShare:", err);
     fails['fails'].push("StackShare");
-    await stack.setDown();
+    await stack.close();
   }
 
-  const crunchbase = new Crunchbase(company);
+  const crunchbase = new Crunchbase(company, headless);
   try {
     fundingData = await crunchbase.scrape();
   } catch(err) {
     console.log("Error scrapping Crunchbase:", err);
     fails['fails'].push("Crunchbase");
-    await crunchbase.setDown();
+    await crunchbase.close();
   }
 
-  const glassdoor = new Glassdoor(company, secrets['glassdoor']);
+  const glassdoor = new Glassdoor(company, secrets['glassdoor'], headless);
   try {
     ratingData = await glassdoor.scrape();
    } catch(err) {
     console.log("Error scrapping Glassdoor:", err);
     fails['fails'].push("Glassdoor");
-    await glassdoor.setDown();
+    await glassdoor.close();
   }
 
   var data = {
     "company": company,
     ...fails,
-    ...linkedinData,
+    ...linkedinCompanyData,
+    ...linkedinSalaryData,
     ...stackData,
     ...fundingData,
     ...ratingData
@@ -94,9 +109,9 @@ async function getCompanyInfo(company, secrets) {
   return data;
 }
 
-async function main() {
+async function main(headless=true) {
   const secrets = await utils.readSecrets(); //TODO: Make example.json off secrets.json
-  const dbData = await connectToCollection(secrets);
+  const dbData = await utils.connectToData(secrets);
 
   for (var i = 0; i < COMPANY_LIST.length; i++) {
     company = COMPANY_LIST[i];
@@ -105,7 +120,7 @@ async function main() {
     var companyDoc = await dbData.find({"company": company}).toArray();
     if(companyDoc.length == 0) {
       try {
-        const data = await getCompanyInfo(company, secrets);
+        const data = await getCompanyInfo(company, secrets, headless);
         await dbData.insertOne(data);
       } catch (err) {
         console.log("Failed to scrape", company, "with", err);
@@ -118,4 +133,4 @@ async function main() {
 
 }
 
-main();
+main(false);

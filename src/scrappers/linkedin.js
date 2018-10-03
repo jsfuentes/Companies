@@ -5,12 +5,13 @@ const
 const LINKEDIN_BASE_URL = "https://www.linkedin.com/"
 
 module.exports = class Linkedin {
-  constructor(company, secrets) {
+  constructor(company, secrets, headless) {
     this.company = company;
     this.LINKEDIN_SALARY_URL = LINKEDIN_BASE_URL + "salary/software-engineer-salaries-in-san-francisco-bay-area-at-" + company;
     this.LINKEDIN_COMPANY_URL = LINKEDIN_BASE_URL + "company/" + company + "/";
     this.data = {};
     this.cookie = secrets['cookie'];
+    this.headless = headless;
   }
 
   async scrollPage() {
@@ -19,11 +20,16 @@ module.exports = class Linkedin {
     });
   }
 
-  async scrape() {
+  async scrape(salary=true, company=true) {
     await this.setup();
-    await this.salary();
-    await utils.randomDelay();
-    await this.companyInfo();
+    if(salary) {
+      await this.salary();
+      await utils.randomDelay();
+    }
+    
+    if(company) {
+      await this.companyInfo();
+    }
 
     await utils.randomDelay();
     await this.close();
@@ -31,7 +37,7 @@ module.exports = class Linkedin {
   }
 
   async setup() {
-    this.browser = await puppeteer.launch({headless: false});
+    this.browser = await puppeteer.launch({headless: this.headless});
     this.page = await this.browser.newPage()
     //not sure if this works actually...
     await this.page.on('console', msg => {

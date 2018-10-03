@@ -1,5 +1,6 @@
 const
   fs = require('fs'),
+  MongoClient = require('mongodb').MongoClient,
   util = require('util');
 
 
@@ -22,8 +23,22 @@ async function readSecrets() {
   return JSON.parse(data);
 }
 
+async function connectToData(secrets) {
+  const db = await MongoClient.connect(secrets['db_uri'], { useNewUrlParser: true });
+
+  const dbo = db.db("companies");
+  return dbo.collection("data");
+}
+
+async function connectToSanitizedData(secrets) {
+  const db = await MongoClient.connect(secrets['db_uri'], { useNewUrlParser: true });
+
+  const dbo = db.db("companies");
+  return dbo.collection("sanitized_data");
+}
+
 function moneyToNumber(moneyStr) {
   return parseInt(moneyStr.replace(/[^0-9.-]+/g, ''));
 }
 
-module.exports = {delay, randomDelay, readSecrets, moneyToNumber};
+module.exports = {delay, randomDelay, readSecrets, connectToData, connectToSanitizedData, moneyToNumber};

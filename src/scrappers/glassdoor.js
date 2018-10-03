@@ -5,14 +5,15 @@ const
 const BASE_URL = "https://www.glassdoor.com/";
 
 module.exports = class Glassdoor {
-  constructor(company, secrets) {
+  constructor(company, secrets, headless) {
     this.company = company;
     this.data= {'glassdoor_rating': {}};
-    this.secrets = secrets
+    this.secrets = secrets;
+    this.headless = headless;
   }
 
   async setup() {
-    this.browser = await puppeteer.launch({headless: false});
+    this.browser = await puppeteer.launch({headless: this.headless});
     this.page = await this.browser.newPage();
     //not sure if this works actually...
     await this.page.on('console', msg => {

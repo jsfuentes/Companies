@@ -3,14 +3,15 @@ const
   utils = require('../utils.js');
 
 module.exports = class Crunchbase {
-  constructor(company) {
+  constructor(company, headless) {
     this.company = company;
     this.COMPANY_URL = "https://www.crunchbase.com" + "/organization/" + company;
     this.data = {'funding': []};
+    this.headless = headless;
   }
 
   async setup() {
-    this.browser = await puppeteer.launch({headless: false});
+    this.browser = await puppeteer.launch({headless: this.headless});
     this.page = await this.browser.newPage();
     //not sure if this works actually...
     await this.page.on('console', msg => {
