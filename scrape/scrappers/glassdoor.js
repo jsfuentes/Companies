@@ -4,7 +4,7 @@ const
 
 const BASE_URL = "https://www.glassdoor.com/";
 
-//TODO: Scrape Glassdoor way better
+//TODO: Scrape Glassdoor way better adding mission and url 
 module.exports = class Glassdoor {
   constructor(company, secrets, headless) {
     this.company = company;

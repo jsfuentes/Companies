@@ -16,7 +16,7 @@ module.exports = class Linkedin {
 
   async scrollPage() {
     await this.page.evaluate(_ => {
-      window.scrollBy(0, window.innerHeight, behavior: 'smooth');
+      window.scrollBy({left: 0, top: window.innerHeight, behavior: 'smooth'});
     });
   }
 

@@ -7,6 +7,7 @@ const
   k = require('./constants.js'),
   utils = require('./utils.js');
 
+//TODO: Scrape owler too, get muse links, get crunchbase link too
 async function getCompanyInfo(company, secrets, headless) {
   let linkedinCompanyData = linkedinSalaryData = stackData = fundingData = ratingData = {};
   let fails = {"fails": []};

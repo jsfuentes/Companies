@@ -1,0 +1,7 @@
+# COPY THIS FILE INTO `.env` AND THEN ADD YOUR VARIABLES
+
+# this can hold environment variables managed by flask run through the python-dotenv lib
+# MONGODB_HOST=mongodb://admin:admin1@ds018238.mlab.com:18238/personal
+
+# Uncomment below line to enable automatic reload, production build is default
+# FLASK_ENV=development
