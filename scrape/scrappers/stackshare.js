@@ -2,6 +2,7 @@ const
   puppeteer = require('puppeteer'),
   utils = require('../utils.js');
 
+//TODO: Notice cant find page
 module.exports = class StackShare {
   constructor(company, headless) {
     this.company = company;

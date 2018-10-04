@@ -1,21 +1,19 @@
 const
-  utils = require('./utils.js');
+  utils = require('./utils.js'),
+  conf = require('./config.js');
 
-const TENURE = 1.5;
-const BONUS_MULTIPLER = .9;
-//assume two year average tenure and discount bonuses by .9 as taxed more / speculative
 function weighSalary(key, amount) {
   if(key == 'Sign-on bonus') {
-    amount = amount / TENURE;
+    amount = amount / conf.TENURE;
   } else {
-    amount *= TENURE;
+    amount *= conf.TENURE;
   }
 
   if(key == 'Sign-on bonus' || key == 'Annual bonus') {
-    amount *= BONUS_MULTIPLER;
+    amount *= conf.BONUS_MULTIPLER;
   }
 
-  return amount/TENURE;
+  return amount/conf.TENURE;
 }
 
 async function main() {
@@ -35,6 +33,7 @@ async function main() {
             e['comp'][key] = curAmount;
         }
       }
+      total = Math.round(total/1000)*1000;
       e['comp']['total'] = total;
       console.log(e['company'], total);
     }

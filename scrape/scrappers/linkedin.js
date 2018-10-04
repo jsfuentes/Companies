@@ -8,7 +8,7 @@ module.exports = class Linkedin {
   constructor(company, secrets, headless) {
     this.company = company;
     this.LINKEDIN_SALARY_URL = LINKEDIN_BASE_URL + "salary/software-engineer-salaries-in-san-francisco-bay-area-at-" + company;
-    this.LINKEDIN_COMPANY_URL = LINKEDIN_BASE_URL + "company/" + company + "/";
+    this.LINKEDIN_SEARCH_URL = LINKEDIN_BASE_URL + "search/results/companies/v2/?keywords=" + company + "&origin=SWITCH_SEARCH_VERTICAL";
     this.data = {};
     this.cookie = secrets['cookie'];
     this.headless = headless;
@@ -16,7 +16,7 @@ module.exports = class Linkedin {
 
   async scrollPage() {
     await this.page.evaluate(_ => {
-      window.scrollBy(0, window.innerHeight);
+      window.scrollBy(0, window.innerHeight, behavior: 'smooth');
     });
   }
 
@@ -26,12 +26,12 @@ module.exports = class Linkedin {
       await this.salary();
       await utils.randomDelay();
     }
-    
+
     if(company) {
       await this.companyInfo();
+      await utils.randomDelay();
     }
 
-    await utils.randomDelay();
     await this.close();
     return this.data;
   }
@@ -56,15 +56,32 @@ module.exports = class Linkedin {
   }
 
   async companyInfo() {
-    await this.page.goto(this.LINKEDIN_COMPANY_URL);
+    await this.page.goto(this.LINKEDIN_SEARCH_URL);
+
+    const companyResultS = '.search-result__title';
+    await this.page.waitForSelector(companyResultS);
+    await utils.randomDelay();
+    await this.page.click(companyResultS);
+    
+    const descriptionS = '.org-about-us-organization-description__text';
+    await this.page.waitForSelector(descriptionS);
+    this.data['description'] = await this.page.$eval(descriptionS, x => x.innerText.trim());
+    this.data['linkedin_url'] = this.page.url();
 
     const foundingS = '.org-about-company-module__founded';
-    await this.page.waitForSelector(foundingS);
-    this.data['founding_year'] = await this.page.$eval(foundingS, x => x.innerText.trim());
+    try {
+      this.data['founding_year'] = await this.page.$eval(foundingS, x => x.innerText.trim());
+    } catch(_) {}
+    const websiteS = '.org-about-company-module__company-page-url'; 
+    try {
+      this.data['website'] = await this.page.$eval(websiteS, x => x.innerText.trim());
+    } catch(_) {}
     const headquartersS = '.org-about-company-module__headquarters';
-    this.data['headquarters'] = await this.page.$eval(headquartersS, x => x.innerText.trim());
-
-    utils.randomDelay();
+    try {
+      this.data['headquarters'] = await this.page.$eval(headquartersS, x => x.innerText.trim());
+    } catch(_) {}
+    
+    await utils.randomDelay();
     await this.scrollPage();
 
     //Employees
@@ -99,21 +116,32 @@ module.exports = class Linkedin {
         const percent = cols[2].innerText.trim();
         data[type] = { count, percent };
       });
-
+      
       return data;
     });
 
     this.data['employees']['avg_tenure'] = await this.page.evaluate(() => {
       return document.querySelector('.org-insights-module__facts').querySelector('strong').innerText;
     });
+    
+    return;
   }
 
-  //TODO: Detect reroute cuz copmany doesnt exist, rn scrapes basic SF data
+  //TODO: Detect reroute cuz company doesnt exist, rn scrapes basic SF data
   async salary() {
     await this.page.goto(this.LINKEDIN_SALARY_URL);
 
     const filterS = '#yxFilter';
     await this.page.waitForSelector(filterS);
+    
+    const companyLogo = '.cohortCard__companyLogo';
+    try {
+      await this.page.waitForSelector(companyLogo);
+    } catch(err) {
+      throw new Error("Linkedin Salary in the Bay doesn't have the salary");
+    }
+    this.data['logo'] = await this.page.$eval(companyLogo, x => x.src);
+      
     await utils.randomDelay();
     await this.page.select(filterS, '0-0'); //select less than 1 year
 

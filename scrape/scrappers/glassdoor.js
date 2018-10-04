@@ -4,6 +4,7 @@ const
 
 const BASE_URL = "https://www.glassdoor.com/";
 
+//TODO: Scrape Glassdoor way better
 module.exports = class Glassdoor {
   constructor(company, secrets, headless) {
     this.company = company;
@@ -37,11 +38,11 @@ module.exports = class Glassdoor {
     await utils.randomDelay();
     const usernameS = "#LoginModal > div > div > div.signInModal.modalContents > div.signin > div:nth-child(4) > div.emailSignInForm > form > div:nth-child(3) > div > input";
     await this.page.waitForSelector(usernameS);
-    await this.page.type(usernameS, this.secrets['username']);
+    await this.page.type(usernameS, this.secrets['username'], {delay: 90});
 
     await utils.randomDelay();
     const passwordS = '#LoginModal > div > div > div.signInModal.modalContents > div.signin > div:nth-child(4) > div.emailSignInForm > form > div:nth-child(4) > div > input';
-    await this.page.type(passwordS, this.secrets['password']);
+    await this.page.type(passwordS, this.secrets['password'], {delay: 118});
 
     await utils.randomDelay();
     const loginButtonS = '#LoginModal > div > div > div.signInModal.modalContents > div.signin > div:nth-child(4) > div.emailSignInForm > form > button';
@@ -70,7 +71,7 @@ module.exports = class Glassdoor {
     });
 
     await utils.randomDelay();
-    await this.page.type(searchS, this.company);
+    await this.page.type(searchS, this.company, {delay: 93});
 
     await utils.randomDelay();
     const searchButtonS ='#HeroSearchButton';
@@ -104,7 +105,7 @@ module.exports = class Glassdoor {
       await this.page.click(filterArrow);
 
       await utils.randomDelay();
-      await this.page.type('#FilterJobTitle', 'software');
+      await this.page.type('#FilterJobTitle', 'software', {delay: 105});
 
       await utils.randomDelay();
       const filterButton = '#FilterButtons > div.ib.applyBtn > button';

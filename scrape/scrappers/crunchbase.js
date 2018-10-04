@@ -2,6 +2,8 @@ const
   puppeteer = require('puppeteer'),
   utils = require('../utils.js');
 
+//TODO: Handle when Crunchbase blocks you by saving the urls for later use 
+//TODO: Notice can't find page
 module.exports = class Crunchbase {
   constructor(company, headless) {
     this.company = company;
