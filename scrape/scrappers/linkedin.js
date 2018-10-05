@@ -1,27 +1,25 @@
 const
   puppeteer = require('puppeteer'),
+  Scrapper = require('./base.js'),
   utils = require('../utils.js');
 
 const LINKEDIN_BASE_URL = "https://www.linkedin.com/"
 
-module.exports = class Linkedin {
-  constructor(company, secrets, headless) {
-    this.company = company;
+module.exports = class Linkedin extends Scrapper {
+  constructor(company, headless, secrets) {
+    super(company, headless, secrets);
     this.LINKEDIN_SALARY_URL = LINKEDIN_BASE_URL + "salary/software-engineer-salaries-in-san-francisco-bay-area-at-" + company;
     this.LINKEDIN_SEARCH_URL = LINKEDIN_BASE_URL + "search/results/companies/v2/?keywords=" + company + "&origin=SWITCH_SEARCH_VERTICAL";
     this.data = {};
-    this.cookie = secrets['cookie'];
-    this.headless = headless;
-  }
-
-  async scrollPage() {
-    await this.page.evaluate(_ => {
-      window.scrollBy({left: 0, top: window.innerHeight, behavior: 'smooth'});
-    });
   }
 
   async scrape(salary=true, company=true) {
     await this.setup();
+    await this.page.setCookie({
+      name: this.secrets.cookie['name'],
+      value: this.secrets.cookie['value'],
+      url: LINKEDIN_BASE_URL});
+      
     if(salary) {
       await this.salary();
       await utils.randomDelay();
@@ -34,25 +32,6 @@ module.exports = class Linkedin {
 
     await this.close();
     return this.data;
-  }
-
-  async setup() {
-    this.browser = await puppeteer.launch({headless: this.headless});
-    this.page = await this.browser.newPage()
-    //not sure if this works actually...
-    await this.page.on('console', msg => {
-      for (let i = 0; i < msg.args.length; ++i)
-        console.log(`${i}: ${msg.args[i]}`);
-    });
-
-    await this.page.setCookie({
-      name: this.cookie['name'],
-      value: this.cookie['value'],
-      "url": LINKEDIN_BASE_URL});
-  }
-
-  async close() {
-    await this.browser.close();
   }
 
   async companyInfo() {
@@ -127,7 +106,7 @@ module.exports = class Linkedin {
     return;
   }
 
-  //TODO: Detect reroute cuz company doesnt exist, rn scrapes basic SF data
+  //TODO: Detect headquarters and if in New York check salary there
   async salary() {
     await this.page.goto(this.LINKEDIN_SALARY_URL);
 

@@ -1,30 +1,25 @@
 const
   puppeteer = require('puppeteer'),
+  Scrapper = require('./base.js'),
   utils = require('../utils.js');
 
 const BASE_URL = "https://www.glassdoor.com/";
 
 //TODO: Scrape Glassdoor way better adding mission and url 
-module.exports = class Glassdoor {
-  constructor(company, secrets, headless) {
-    this.company = company;
+module.exports = class Glassdoor extends Scrapper{
+  constructor(company, headless, secrets) {
+    super(company, headless, secrets);
     this.data= {'glassdoor_rating': {}};
-    this.secrets = secrets;
-    this.headless = headless;
   }
+  
+  async scrape() {
+    await this.setup();
+    await this.getToReviewPage();
+    await this.getRatings();
 
-  async setup() {
-    this.browser = await puppeteer.launch({headless: this.headless});
-    this.page = await this.browser.newPage();
-    //not sure if this works actually...
-    await this.page.on('console', msg => {
-      for (let i = 0; i < msg.args.length; ++i)
-        console.log(`${i}: ${msg.args[i]}`);
-    });
-  }
-
-  async close() {
-    await this.browser.close();
+    await utils.randomDelay();
+    await this.close();
+    return this.data;
   }
 
   //must be run on review page
@@ -38,25 +33,15 @@ module.exports = class Glassdoor {
     await utils.randomDelay();
     const usernameS = "#LoginModal > div > div > div.signInModal.modalContents > div.signin > div:nth-child(4) > div.emailSignInForm > form > div:nth-child(3) > div > input";
     await this.page.waitForSelector(usernameS);
-    await this.page.type(usernameS, this.secrets['username'], {delay: 90});
+    await this.page.type(usernameS, this.secrets['username'], {delay: 54});
 
     await utils.randomDelay();
     const passwordS = '#LoginModal > div > div > div.signInModal.modalContents > div.signin > div:nth-child(4) > div.emailSignInForm > form > div:nth-child(4) > div > input';
-    await this.page.type(passwordS, this.secrets['password'], {delay: 118});
+    await this.page.type(passwordS, this.secrets['password'], {delay: 79});
 
     await utils.randomDelay();
     const loginButtonS = '#LoginModal > div > div > div.signInModal.modalContents > div.signin > div:nth-child(4) > div.emailSignInForm > form > button';
     await this.page.click(loginButtonS);
-  }
-
-  async scrape() {
-    await this.setup();
-    await this.getToReviewPage();
-    await this.getRatings();
-
-    await utils.randomDelay();
-    await this.close();
-    return this.data;
   }
 
   async getToReviewPage() {
@@ -71,7 +56,7 @@ module.exports = class Glassdoor {
     });
 
     await utils.randomDelay();
-    await this.page.type(searchS, this.company, {delay: 93});
+    await this.page.type(searchS, this.company, {delay: 59});
 
     await utils.randomDelay();
     const searchButtonS ='#HeroSearchButton';
@@ -91,6 +76,7 @@ module.exports = class Glassdoor {
     });
   }
 
+  //TODO: filter to fulltime
   async getRatings() {
     await this.page.waitForSelector('.ratingNum');
     this.data['glassdoor_rating']['total'] = await this.page.evaluate(() => document.querySelector('.ratingNum').innerText);
@@ -105,7 +91,7 @@ module.exports = class Glassdoor {
       await this.page.click(filterArrow);
 
       await utils.randomDelay();
-      await this.page.type('#FilterJobTitle', 'software', {delay: 105});
+      await this.page.type('#FilterJobTitle', 'software', {delay: 97});
 
       await utils.randomDelay();
       const filterButton = '#FilterButtons > div.ib.applyBtn > button';

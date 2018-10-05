@@ -1,30 +1,16 @@
 const
   puppeteer = require('puppeteer'),
+  Scrapper = require('./base.js'),
   utils = require('../utils.js');
 
 //TODO: Handle when Crunchbase blocks you by saving the urls for later use 
 //TODO: Notice can't find page
-module.exports = class Crunchbase {
+//TODO: Scrape ticker number 
+module.exports = class Crunchbase extends Scrapper {
   constructor(company, headless) {
-    this.company = company;
+    super(company, headless);
     this.COMPANY_URL = "https://www.crunchbase.com" + "/organization/" + company;
     this.data = {'funding': []};
-    this.headless = headless;
-  }
-
-  async setup() {
-    this.browser = await puppeteer.launch({headless: this.headless});
-    this.page = await this.browser.newPage();
-    //not sure if this works actually...
-    await this.page.on('console', msg => {
-      for (let i = 0; i < msg.args.length; ++i)
-        console.log(`${i}: ${msg.args[i]}`);
-    });
-    this.page.setDefaultNavigationTimeout(60000); //increase timeout to 1 minutes
-  }
-
-  async close() {
-    await this.browser.close();
   }
 
   async scrape() {

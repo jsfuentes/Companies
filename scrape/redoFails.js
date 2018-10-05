@@ -1,4 +1,7 @@
-// const
+const
+  Scrapper = require('./scrappers/base.js');
+  
+console.log(typeof(Scrapper));
 //   Linkedin = require('./scrappers/linkedin.js'),
 //   StackShare = require('./scrappers/stackshare.js'),
 //   Crunchbase = require('./scrappers/crunchbase.js'),
@@ -55,6 +58,3 @@
 //   }
 // }
 
-try {
-  throw "err";
-} catch

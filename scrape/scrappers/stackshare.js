@@ -1,29 +1,15 @@
 const
   puppeteer = require('puppeteer'),
+  Scrapper = require('./base.js'),
   utils = require('../utils.js');
 
 //TODO: Notice cant find page
-module.exports = class StackShare {
+module.exports = class StackShare extends Scrapper {
   constructor(company, headless) {
-    this.company = company;
+    super(company, headless);
     this.BASE_URL = "https://stackshare.io/"
     this.COMPANY_URL = this.BASE_URL + company + "/" + company;
     this.data = {};
-    this.headless = headless;
-  }
-
-  async setup() {
-    this.browser = await puppeteer.launch({headless: this.headless});
-    this.page = await this.browser.newPage();
-    //not sure if this works actually...
-    await this.page.on('console', msg => {
-      for (let i = 0; i < msg.args.length; ++i)
-        console.log(`${i}: ${msg.args[i]}`);
-    });
-  }
-
-  async close() {
-    await this.browser.close();
   }
 
   async scrape() {
