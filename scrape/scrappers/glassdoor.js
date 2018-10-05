@@ -3,7 +3,7 @@ const
   Scrapper = require('./base.js'),
   utils = require('../utils.js');
 
-const BASE_URL = "https://www.glassdoor.com/";
+const GLASSDOOR_BASE_URL = "https://www.glassdoor.com/";
 
 //TODO: Scrape Glassdoor way better adding mission and url 
 module.exports = class Glassdoor extends Scrapper{
@@ -45,7 +45,7 @@ module.exports = class Glassdoor extends Scrapper{
   }
 
   async getToReviewPage() {
-    await this.page.goto(BASE_URL);
+    await this.page.goto(GLASSDOOR_BASE_URL);
 
     const searchS ='#KeywordSearch';
     await this.page.waitForSelector(searchS);

@@ -1,8 +1,16 @@
 module.exports = {
+  //////////////////
+  //List Of Scrappers 
+  //////////////////
   STACKSHARE: "StackShare",
-  LINKEDIN: "Linkedin",
   LINKEDIN_COMPANY: "Linkedin Company",
   LINKEDIN_SALARY: "Linkedin Salary",
   GLASSDOOR: "Glassdoor",
-  CRUNCHBASE: "Crunchbase"
+  CRUNCHBASE: "Crunchbase",
+  
+  ///////////////////
+  //OTHER
+  //////////////////
+  LINKEDIN: "Linkedin",
+  SCRAPE_ALL: "All"
 }

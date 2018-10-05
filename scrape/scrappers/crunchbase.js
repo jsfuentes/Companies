@@ -3,13 +3,14 @@ const
   Scrapper = require('./base.js'),
   utils = require('../utils.js');
 
+const CRUNCHBASE_BASE_URL = "https://www.crunchbase.com";
 //TODO: Handle when Crunchbase blocks you by saving the urls for later use 
 //TODO: Notice can't find page
 //TODO: Scrape ticker number 
 module.exports = class Crunchbase extends Scrapper {
-  constructor(company, headless) {
-    super(company, headless);
-    this.COMPANY_URL = "https://www.crunchbase.com" + "/organization/" + company;
+  constructor(company, headless, secrets) {
+    super(company, headless, secrets);
+    this.COMPANY_URL = CRUNCHBASE_BASE_URL + "/organization/" + company;
     this.data = {'funding': []};
   }
 

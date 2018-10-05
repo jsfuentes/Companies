@@ -7,14 +7,6 @@ module.exports = {
   BONUS_MULTIPLER: .9,
   
   /////////////////////////////
-  //Scrapper List 
-  //////////////////////////////
-  SCRAPPERS: [
-    
-  ]
-  
-  
-  /////////////////////////////
   //COMPANY List 
   //////////////////////////////
   COMPANY_LIST: [
@@ -28,6 +20,7 @@ module.exports = {
     "box",
     "clover-health",
     "coursera",
+    "coinbase",
     "cruise",
     "databricks",
     "docker",
@@ -60,9 +53,9 @@ module.exports = {
     "uber",
     "udacity",
     "waymo",
+    "treehouse",
     // "pandora",
     // "Social Capital",
     // "tile",
-    // "coinbase"
   ],
 }

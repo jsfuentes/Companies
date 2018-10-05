@@ -3,32 +3,24 @@ const
   Scrapper = require('./base.js'),
   utils = require('../utils.js');
 
-const LINKEDIN_BASE_URL = "https://www.linkedin.com/"
+const LINKEDIN_BASE_URL = "https://www.linkedin.com/";
 
-module.exports = class Linkedin extends Scrapper {
+module.exports = class LinkedinCompany extends Scrapper {
   constructor(company, headless, secrets) {
     super(company, headless, secrets);
-    this.LINKEDIN_SALARY_URL = LINKEDIN_BASE_URL + "salary/software-engineer-salaries-in-san-francisco-bay-area-at-" + company;
     this.LINKEDIN_SEARCH_URL = LINKEDIN_BASE_URL + "search/results/companies/v2/?keywords=" + company + "&origin=SWITCH_SEARCH_VERTICAL";
     this.data = {};
   }
 
-  async scrape(salary=true, company=true) {
+  async scrape() {
     await this.setup();
     await this.page.setCookie({
       name: this.secrets.cookie['name'],
       value: this.secrets.cookie['value'],
       url: LINKEDIN_BASE_URL});
       
-    if(salary) {
-      await this.salary();
-      await utils.randomDelay();
-    }
-
-    if(company) {
-      await this.companyInfo();
-      await utils.randomDelay();
-    }
+    await this.companyInfo();
+    await utils.randomDelay();
 
     await this.close();
     return this.data;
@@ -105,42 +97,5 @@ module.exports = class Linkedin extends Scrapper {
     
     return;
   }
-
-  //TODO: Detect headquarters and if in New York check salary there
-  async salary() {
-    await this.page.goto(this.LINKEDIN_SALARY_URL);
-
-    const filterS = '#yxFilter';
-    await this.page.waitForSelector(filterS);
-    
-    const companyLogo = '.cohortCard__companyLogo';
-    try {
-      await this.page.waitForSelector(companyLogo);
-    } catch(err) {
-      throw new Error("Linkedin Salary in the Bay doesn't have the salary");
-    }
-    this.data['logo'] = await this.page.$eval(companyLogo, x => x.src);
-      
-    await utils.randomDelay();
-    await this.page.select(filterS, '0-0'); //select less than 1 year
-
-    const baseS = '.median-amount';
-    await this.page.waitForSelector(baseS);
-    const base = await this.page.$eval(baseS, x => x.innerText.trim());
-
-    const extras = await this.page.evaluate(() => {
-      names = document.querySelectorAll('.addc-CellContent__name');
-      extras = document.querySelectorAll('.addc-CellContent__median__amount');
-      let data = {};
-      for (let i = 0; i < names.length; i++) {
-        data[names[i].innerText.trim()] = extras[i].innerText.trim();
-      }
-      return data;
-    });
-
-    this.data['comp'] = {
-      ['base']: base,
-      ...extras
-    }
-  }
+  
 }

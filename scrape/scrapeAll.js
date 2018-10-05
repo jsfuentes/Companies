@@ -1,6 +1,6 @@
 const
   conf = require('./config.js'),
-  jscrape = require('./scrape.js'),
+  Jscrape = require('./scrape.js'),
   utils = require('./utils.js');
 
 async function main(headless=true) {
@@ -11,10 +11,11 @@ async function main(headless=true) {
     company = conf.COMPANY_LIST[i];
     console.log("Scraping", company);
 
-    var companyDoc = await dbData.find({"company": company}).toArray();
-    if(companyDoc.length == 0) {
+    var companyDocs = await dbData.find({"company": company}).toArray();
+    if(companyDocs.length == 0) {
       try {
-        const data = await jscrape.getCompanyInfo(company, headless, secrets);
+        const jscrape = new Jscrape(company, headless, secrets);
+        const data = await jscrape.getCompanyInfo();
         await dbData.insertOne(data);
       } catch (err) {
         console.log("Failed to scrape", company, "with", err);

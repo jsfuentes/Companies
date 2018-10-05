@@ -3,12 +3,13 @@ const
   Scrapper = require('./base.js'),
   utils = require('../utils.js');
 
+const STACKSHARE_BASE_URL = "https://stackshare.io/"
+
 //TODO: Notice cant find page
 module.exports = class StackShare extends Scrapper {
-  constructor(company, headless) {
-    super(company, headless);
-    this.BASE_URL = "https://stackshare.io/"
-    this.COMPANY_URL = this.BASE_URL + company + "/" + company;
+  constructor(company, headless, secrets) {
+    super(company, headless, secrets);
+    this.COMPANY_URL = STACKSHARE_BASE_URL + company + "/" + company;
     this.data = {};
   }
 

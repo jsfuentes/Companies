@@ -3,91 +3,68 @@ const
   Crunchbase = require('./scrappers/crunchbase.js'),
   Glassdoor = require('./scrappers/glassdoor.js'),
   k = require('./constants.js'),
-  Linkedin = require('./scrappers/linkedin.js'),
+  LinkedinSalary = require('./scrappers/linkedinSalary.js'),
+  LinkedinCompany = require('./scrappers/linkedinCompany.js'),
   StackShare = require('./scrappers/stackshare.js'),
   utils = require('./utils.js');
   
 SCRAPPERS = [
-  Crunchbase, 
-  Glassdoor, 
-  Linkedin,
-  StackShare,
-]
+  [k.LINKEDIN_COMPANY, LinkedinCompany],
+  [k.LINKEDIN_SALARY, LinkedinSalary],
+  [k.CRUNCHBASE, Crunchbase],
+  [k.STACKSHARE, StackShare],
+  [k.GLASSDOOR, Glassdoor], 
+];
 
-class Jscrape {
-  constructor(company, headless, secrets, toScrape=["All"]) {
-    this.fails = {fails: []};
-    this.wins = {wins: []);
+//TODO: Scrape owler too, get muse links, get crunchbase link too
+module.exports = class Jscrape {
+  constructor(company, headless, secrets) {
+    this.fails = [];
+    this.wins = [];
     this.company = company;
     this.headless = headless;
     this.secrets = secrets;
-    this.toScrape = toScrape;
+    this.allInfo = {};
   }
   
+  async getCompanyInfo(toScrape=[k.SCRAPE_ALL]) {
+    for(let i = 0; i < SCRAPPERS.length; i++) {
+      let scrapeDef = SCRAPPERS[i];
+      let scrapeKey = scrapeDef[0];
+      let scrapeClass = scrapeDef[1];
+      
+      //TODO: Find a way to do this in parallel with promises
+      if(toScrape[0] = k.SCRAPE_ALL || toScrape.indexOf(scrapeKey) != -1) {
+        await this.scrape(scrapeKey, scrapeClass);
+      }
+    }
+    
+    this.allInfo = {
+      "company": company,
+      "fails": this.fails,
+      "wins": this.wins,
+      ...this.allInfo 
+    }
+    
+    console.log(this.allInfo);
+    return this.allInfo;
+  }
+  
+  //collects wins, fails, and info 
+  async scrape(scrapeKey, scrapeClass) {
+    const scrapper = new scrapeClass(this.company, this.headless, this.secrets[scrapeKey]);
+    try {
+      let data = await scrapper.scrape();
+      this.wins.push(scrapeKey);
+      this.allInfo = {
+        ...this.allInfo,
+        ...data
+      }
+    } catch (err) {
+      console.log("Error scrapping", scrapeKey, ":", err);
+      this.fails.push(scrapeKey);
+      await scrapper.close();
+    }
+  }
   
 }
-
-//TODO: Scrape owler too, get muse links, get crunchbase link too
-async function getCompanyInfo(company, headless, secrets) {
-  let linkedinCompanyData = linkedinSalaryData = stackData = fundingData = ratingData = {};
-  let fails = {"fails": []};
-
-  const linkedin = new Linkedin(company, headless, secrets['linkedin']);
-  try {
-    linkedinCompanyData = await linkedin.scrape(false, true);
-  } catch(err) {
-    console.log("Error scrapping Linkedin Company:", err);
-    fails['fails'].push(k.LINKEDIN_COMPANY);
-    await linkedin.close();
-  }
-
-  try {
-    linkedinSalaryData = await linkedin.scrape(true, false);
-  } catch(err) {
-    console.log("Error scrapping Linkedin Salary:", err);
-    fails['fails'].push(k.LINKEDIN_SALARY);
-    await linkedin.close();
-  }
-
-  const stack = new StackShare(company, headless);
-  try {
-    stackData = await stack.scrape();
-  } catch(err) {
-    console.log("Error scrapping StackShare:", err);
-    fails['fails'].push(k.STACKSHARE);
-    await stack.close();
-  }
-
-  const crunchbase = new Crunchbase(company, headless);
-  try {
-    fundingData = await crunchbase.scrape();
-  } catch(err) {
-    console.log("Error scrapping Crunchbase:", err);
-    fails['fails'].push(k.CRUNCHBASE);
-    await crunchbase.close();
-  }
-
-  const glassdoor = new Glassdoor(company, headless, secrets['glassdoor']);
-  try {
-    ratingData = await glassdoor.scrape();
-   } catch(err) {
-    console.log("Error scrapping Glassdoor:", err);
-    fails['fails'].push(k.GLASSDOOR);
-    await glassdoor.close();
-  }
-
-  var data = {
-    "company": company,
-    ...fails,
-    ...linkedinCompanyData,
-    ...linkedinSalaryData,
-    ...stackData,
-    ...fundingData,
-    ...ratingData
-  };
-
-  console.log(data);
-  return data;
-}
-
-module.exports = {getCompanyInfo};
