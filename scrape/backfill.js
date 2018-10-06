@@ -8,18 +8,39 @@ const
 //EDIT updateDoc to determine how to update
 //////////////////////
 function updateDoc(d) {
-  let wins = [k.LINKEDIN_COMPANY, k.STACKSHARE, k.LINKEDIN_SALARY, k.GLASSDOOR, k.CRUNCHBASE];
+  let newWins = {};
+  let newFails = {};
   d.fails.forEach((f) => {
-    let i = wins.indexOf(f);
-    if (i != -1) {
-      wins.splice(i, 1);
-    }
+    const key = Object.keys(f)[0];
+    const v = f[key];
+    newFails[key] = v;
   });
   
-  return { $set : { "wins" : wins } };
+  d.wins.forEach((w) => {
+    const key = Object.keys(w)[0];
+    const v = w[key];
+    newWins[key] = v;
+  });
+  
+  
+  return  {"wins" : newWins, "fails": newFails };
 }
 
-async function backfill() {
+async function testBackfill(company) {
+  const secrets = await utils.readSecrets();
+  const dbData = await utils.connectToData(secrets);
+  
+  const query = {company: company};
+  let companyDoc = await dbData.find(query).toArray();
+  companyDoc.forEach((d) => {
+    const newDoc = updateDoc(d);
+    dbData.updateOne(query, {$set: newDoc});
+  });
+  
+  console.log("Backfill of", company, "complete");
+}
+
+async function backfillAll() {
   const secrets = await utils.readSecrets();
   const dbData = await utils.connectToData(secrets);
   // const dbSanitizedData = await utils.connectToSanitizedData(secrets);
@@ -27,11 +48,12 @@ async function backfill() {
   let companyDoc = await dbData.find().toArray();
   companyDoc.forEach((d) => {
     const query = {company: d['company']};
-    
-    dbData.updateOne(query, updateDoc(d));
+    const newDoc = updateDoc(d);
+    dbData.updateOne(query, {$set: newDoc});
   });
   
-  console.log("Backfill complete");
+  console.log("Backfill All complete");
 }
 
-backfill();
+// testBackfill('medium');
+backfillAll();

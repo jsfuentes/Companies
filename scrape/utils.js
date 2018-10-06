@@ -37,8 +37,15 @@ async function connectToSanitizedData(secrets) {
   return dbo.collection("sanitized_data");
 }
 
+async function connectToBackup(secrets) {
+  const db = await MongoClient.connect(secrets['db_uri'], { useNewUrlParser: true });
+
+  const dbo = db.db("companies");
+  return dbo.collection("backup");
+}
+
 function moneyToNumber(moneyStr) {
   return parseInt(moneyStr.replace(/[^0-9.-]+/g, ''));
 }
 
-module.exports = {delay, randomDelay, readSecrets, connectToData, connectToSanitizedData, moneyToNumber};
+module.exports = {delay, randomDelay, readSecrets, connectToData, connectToSanitizedData, connectToBackup, moneyToNumber};

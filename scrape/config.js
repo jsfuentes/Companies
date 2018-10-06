@@ -1,14 +1,28 @@
+const
+  k = require('./constants.js'),
+  Crunchbase = require('./scrappers/crunchbase.js'),
+  Glassdoor = require('./scrappers/glassdoor.js'),
+  LinkedinSalary = require('./scrappers/linkedinSalary.js'),
+  LinkedinCompany = require('./scrappers/linkedinCompany.js'),
+  StackShare = require('./scrappers/stackshare.js');
+  
 module.exports = {
+  //Key(string name), the scrappers class, and the version
+  SCRAPPERS: [
+    [k.LINKEDIN_COMPANY, LinkedinCompany, 1],
+    [k.LINKEDIN_SALARY, LinkedinSalary, 1],
+    // [k.CRUNCHBASE, Crunchbase, 1],
+    // [k.STACKSHARE, StackShare, 1],
+    [k.GLASSDOOR, Glassdoor, 1], 
+  ],
+  
   /////////////////////////
   //SALARY CALCULATION
   /////////////////////////
   //assume two year average tenure and discount bonuses by .9 as taxed more / speculative
   TENURE: 1.9,
   BONUS_MULTIPLER: .9,
-  
-  /////////////////////////////
-  //COMPANY List 
-  //////////////////////////////
+
   COMPANY_LIST: [
     "affirm",
     "airbnb",
