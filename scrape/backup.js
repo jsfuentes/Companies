@@ -18,6 +18,7 @@ async function backup() {
   
   let companyDoc = await dbData.find().toArray();
   companyDoc.forEach((d) => {
+    delete d["_id"]; //need unique ids, and we want multiple versions in the same db  
     dbBackup.insertOne(addDateToDoc(d));
   });
   

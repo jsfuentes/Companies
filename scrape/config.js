@@ -20,7 +20,7 @@ module.exports = {
   //SALARY CALCULATION
   /////////////////////////
   //assume two year average tenure and discount bonuses by .9 as taxed more / speculative
-  TENURE: 1.9,
+  TENURE: 1,
   BONUS_MULTIPLER: .9,
 
   COMPANY_LIST: [
@@ -35,6 +35,7 @@ module.exports = {
     "clover-health",
     "coursera",
     "coinbase",
+    "convoy",
     "cruise",
     "databricks",
     "docker",
@@ -56,7 +57,9 @@ module.exports = {
     "plaid",
     "quora",
     "robinhood",
+    // "rockset",
     "rubrik",
+    "salesforce",
     "slack",
     "snap",
     "square",

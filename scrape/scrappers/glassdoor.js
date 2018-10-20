@@ -76,7 +76,7 @@ module.exports = class Glassdoor extends Scrapper{
     });
   }
 
-  //TODO: filter to fulltime
+  //TODO: filter to fulltime, add check for secrets
   async getRatings() {
     await this.page.waitForSelector('.ratingNum');
     this.data['glassdoor_rating']['total'] = await this.page.evaluate(() => document.querySelector('.ratingNum').innerText);

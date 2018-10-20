@@ -6,8 +6,8 @@ const
 //TODO: Scrape owler too, get muse links, get crunchbase link too
 module.exports = class Jscrape {
   constructor(company, headless, secrets) {
-    this.fails = [];
-    this.wins = [];
+    this.fails = {};
+    this.wins = {};
     this.company = company;
     this.headless = headless;
     this.secrets = secrets;
@@ -22,7 +22,7 @@ module.exports = class Jscrape {
       let scrapeVersion = scrapeDef[2];
       
       //TODO: Find a way to do this in parallel with promises
-      if(toScrape[0] = k.SCRAPE_ALL || toScrape.indexOf(scrapeKey) != -1) {
+      if(toScrape[0] === k.SCRAPE_ALL || toScrape.indexOf(scrapeKey) != -1) {
         await this.scrape(scrapeKey, scrapeClass, scrapeVersion);
       }
     }
@@ -41,18 +41,17 @@ module.exports = class Jscrape {
   //collects wins, fails, and info 
   async scrape(scrapeKey, scrapeClass, scrapeVersion) {
     const scrapper = new scrapeClass(this.company, this.headless, this.secrets[scrapeKey]);
-    const scrapeInfo = {};
-    scrapeInfo[scrapeKey] = scrapeVersion; // record version and name 
+    //TODO: Add date scrapped to dict maybe
     try {
       let data = await scrapper.scrape();
-      this.wins.push(scrapeInfo);
+      this.wins[scrapeKey] = scrapeVersion;
       this.allInfo = {
         ...this.allInfo,
         ...data
       }
     } catch (err) {
       console.log("Error scrapping", scrapeKey, ":", err);
-      this.fails.push(scrapeInfo);
+      this.fails[scrapeKey] = scrapeVersion;
       await scrapper.close();
     }
   }

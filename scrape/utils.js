@@ -23,25 +23,24 @@ async function readSecrets() {
   return JSON.parse(data);
 }
 
-async function connectToData(secrets) {
+async function connectToDB(secrets, name) {
   const db = await MongoClient.connect(secrets['db_uri'], { useNewUrlParser: true });
 
   const dbo = db.db("companies");
-  return dbo.collection("data");
+  return dbo.collection(name);
+}
+
+//YES I AM NO COMBINING THESE FUNCTION, WHY? YOU WOULD HAVE TO MAKE A CONSTANT RIGHT, WELL THE CONSTANT IS THIS FUNCTION. DRY ISNT GOD
+async function connectToData(secrets) {
+  return connectToDB(secrets, 'data');
 }
 
 async function connectToSanitizedData(secrets) {
-  const db = await MongoClient.connect(secrets['db_uri'], { useNewUrlParser: true });
-
-  const dbo = db.db("companies");
-  return dbo.collection("sanitized_data");
+  return connectToDB(secrets, 'sanitized_data');
 }
 
 async function connectToBackup(secrets) {
-  const db = await MongoClient.connect(secrets['db_uri'], { useNewUrlParser: true });
-
-  const dbo = db.db("companies");
-  return dbo.collection("backup");
+  return connectToDB(secrets, 'backup');
 }
 
 function moneyToNumber(moneyStr) {

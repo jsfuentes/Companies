@@ -22,7 +22,6 @@ function updateDoc(d) {
     newWins[key] = v;
   });
   
-  
   return  {"wins" : newWins, "fails": newFails };
 }
 
