@@ -11,8 +11,8 @@ module.exports = {
   SCRAPPERS: [
     [k.LINKEDIN_COMPANY, LinkedinCompany, 1],
     [k.LINKEDIN_SALARY, LinkedinSalary, 1],
-    // [k.CRUNCHBASE, Crunchbase, 1],
-    // [k.STACKSHARE, StackShare, 1],
+    [k.CRUNCHBASE, Crunchbase, 1],
+    [k.STACKSHARE, StackShare, 1],
     [k.GLASSDOOR, Glassdoor, 1], 
   ],
   
@@ -42,6 +42,7 @@ module.exports = {
     "dropbox",
     "facebook",
     "flexport",
+    "figma",
     "glint",
     "google",
     "gusto",

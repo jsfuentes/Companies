@@ -4,7 +4,7 @@ const
   utils = require('./utils.js');
 
 async function main(headless=true) {
-  const secrets = await utils.readSecrets(); //TODO: Make example.json off secrets.json
+  const secrets = await utils.readSecrets(); 
   const dbData = await utils.connectToData(secrets);
 
   for (var i = 0; i < conf.COMPANY_LIST.length; i++) {
