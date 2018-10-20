@@ -34,14 +34,15 @@ async function main() {
         }
       }
       total = Math.round(total/1000)*1000;
-      e['comp']['total'] = total;
-      let engStats = {count: 0, percent: 0};
-      try {
-        engStats =  e['employees']['type']['Engineering'];
-      } catch (err) {
-        engStats = {count: 0, percent: 0};
-      }
-      console.log(e['company'], total, engStats['count'], engStats['percent']);
+      // e['comp']['total'] = total;
+      // let engStats = {count: 0, percent: 0};
+      // try {
+      //   engStats =  e['employees']['type']['Engineering'];
+      // } catch (err) {
+      //   engStats = {count: 0, percent: 0};
+      // }
+      console.log(e['company'], total);
+      // console.log(e['company'], total, engStats['count'], engStats['percent']);
     }
   });
 }

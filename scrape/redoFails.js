@@ -17,34 +17,45 @@ function getNewFails(oldFails, newWins) {
   return newFails;
 }
 
+function combineData(oldData, data) {
+  const oldFails = oldData.fails;
+  const newWins = {
+    ...data["wins"],
+    ...oldData["wins"]
+  };
+  const newFails = getNewFails(oldFails, newWins);
+  const newData = Object.assign(oldData, data, {"wins": newWins}, {"fails": newFails});//ones to the right override others
+  return newData;
+}
+
 async function redoScrape() {
   const secrets = await utils.readSecrets(); 
   const dbData = await utils.connectToData(secrets);
 
-  const companyDocs = await dbData.find({company: "medium"}).toArray();
+  const companyDocs = await dbData.find().toArray();
   for(let i = 0; i < companyDocs.length; i++) {
     const oldData = companyDocs[i];
     const name = oldData.company;
     const oldFails = oldData.fails;
     console.log(name);
     
+    let data = {};
     try {
-      const jscrape = new Jscrape(name, false, secrets);
-      console.log("oldFails", Object.keys(oldFails));
-      const data = await jscrape.getCompanyInfo(Object.keys(oldFails));  
+      if(Object.keys(oldFails).length != 0) {
+        const jscrape = new Jscrape(name, false, secrets);
+
+        console.log("Redoing: ", Object.keys(oldFails));
+        data = await jscrape.getCompanyInfo(Object.keys(oldFails));  
+        const newData = combineData(oldData, data);
+        
+        const query = {"company": name};
+        await dbData.updateOne(query, {$set: newData});
+        console.log(newData);
+      }
     } catch (err) {
       console.log("Failed to scrape", name, "with", err);
     }
-    
-    const newWins = {
-      ...data["wins"],
-      ...oldData["wins"]
-    };
-    const newFails = getNewFails(oldFails, newWins);
-    console.log("wins", data["wins"], "newFails", newFails);
-    
-    const query = {"company": name};
-    await dbData.update(query, {$set: data});
+
   }
 
 }

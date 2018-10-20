@@ -11,7 +11,7 @@ module.exports = {
   SCRAPPERS: [
     [k.LINKEDIN_COMPANY, LinkedinCompany, 1],
     [k.LINKEDIN_SALARY, LinkedinSalary, 1],
-    [k.CRUNCHBASE, Crunchbase, 1],
+    // [k.CRUNCHBASE, Crunchbase, 1],
     [k.STACKSHARE, StackShare, 1],
     [k.GLASSDOOR, Glassdoor, 1], 
   ],
@@ -20,8 +20,8 @@ module.exports = {
   //SALARY CALCULATION
   /////////////////////////
   //assume two year average tenure and discount bonuses by .9 as taxed more / speculative
-  TENURE: 1,
-  BONUS_MULTIPLER: .9,
+  TENURE: 1.9,
+  BONUS_MULTIPLER: .85 ,
 
   COMPANY_LIST: [
     "affirm",
@@ -61,8 +61,9 @@ module.exports = {
     // "rockset",
     "rubrik",
     "salesforce",
+    // "samsara",
     "slack",
-    "snap",
+    "snap-inc",
     "square",
     "stripe",
     "tesla",

@@ -28,7 +28,7 @@ module.exports = class Jscrape {
     }
     
     this.allInfo = {
-      "company": company,
+      "company": this.company,
       "fails": this.fails,
       "wins": this.wins,
       ...this.allInfo 
@@ -41,7 +41,7 @@ module.exports = class Jscrape {
   //collects wins, fails, and info 
   async scrape(scrapeKey, scrapeClass, scrapeVersion) {
     const scrapper = new scrapeClass(this.company, this.headless, this.secrets[scrapeKey]);
-    //TODO: Add date scrapped to dict maybe
+    //TODO: Add date scrapped to dict
     try {
       let data = await scrapper.scrape();
       this.wins[scrapeKey] = scrapeVersion;

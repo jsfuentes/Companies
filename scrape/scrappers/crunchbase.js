@@ -6,7 +6,8 @@ const
 const CRUNCHBASE_BASE_URL = "https://www.crunchbase.com";
 //TODO: Handle when Crunchbase blocks you by saving the urls for later use 
 //TODO: Notice can't find page
-//TODO: Scrape ticker number 
+//TODO: Scrape ticker number, then use API to get stock price over time for company
+//TODO: Get series number 
 module.exports = class Crunchbase extends Scrapper {
   constructor(company, headless, secrets) {
     super(company, headless, secrets);
@@ -47,6 +48,8 @@ module.exports = class Crunchbase extends Scrapper {
       }
       return links;
     });
+    // console.log(links);
+    //TODO: Save links for general use
 
     return links;
   }
