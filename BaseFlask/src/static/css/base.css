@@ -2,3 +2,19 @@ body {
   background-color: #000000;
   background-image: linear-gradient(to bottom, #FbFbFb, #f3f3f3);
 }
+
+td, th { 
+	padding: 5px 0 5px 10px;
+}
+table {
+    border: 1px solid; 
+    border-collapse: collapse;
+}
+thead tr th { 
+    border-bottom: 1px solid; 
+	background-color: #dedede;
+}
+tbody tr:nth-of-type(even){
+    background-color: #00000010; 
+    //add black with hgih alpha to every other row in body
+}

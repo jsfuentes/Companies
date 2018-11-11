@@ -1,6 +1,7 @@
 #Added
 secrets.json*
 .DS_Store
+.env~
 
 # Logs
 logs

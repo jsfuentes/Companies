@@ -10,9 +10,6 @@ class Config:
 class DevelopmentConfig(Config):
     DEBUG=True
 
-    #Mongoengine Variables
-    MONGODB_HOST=os.environ.get('MONGODB_HOST')
-
 config = {
     'development': DevelopmentConfig,
     'default': DevelopmentConfig
