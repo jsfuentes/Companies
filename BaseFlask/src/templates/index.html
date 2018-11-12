@@ -2,39 +2,55 @@
 {% block title %} Homepage {% endblock %}
 
 {% block head %}
-  <link href="https://unpkg.com/tabulator-tables@4.1.1/dist/css/tabulator.min.css" rel="stylesheet">
-  <script type="text/javascript" src="https://unpkg.com/tabulator-tables@4.1.1/dist/js/tabulator.min.js"></script>
+  <script type="text/javascript" src="{{ url_for('static', filename='libs/tabulator/js/tabulator.js') }}"></script>
   <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
-  <script defer>
-    console.log("HL")
+  <link rel="stylesheet" href="{{ url_for('static', filename='libs/tabulator/css/tabulator_modern.css') }}">
+  
+  <script>
     //define some sample data
      var tabledata = {{ companies|tojson }};
+     console.log(tabledata);
       //create Tabulator on DOM element with id "example-table"
     window.onload = function(){
       var table = new Tabulator("#example-table", {
-       	height:550, // set height of table (in CSS or here), this enables the Virtual DOM and improves render speed dramatically (can be any valid css height value)
+       	height:"100%", // set height of table (in CSS or here), this enables the Virtual DOM and improves render speed dramatically (can be any valid css height value)
        	data:tabledata, //assign data to table
        	layout:"fitData", //fit columns to width of table (optional)
        	columns:[ //Define Table Columns
       	 	{title:"Company", field:"company"},
+          {title:"Headquarters", field:"headquarters", width: "10%"},
       	 	{title:"Founding", field:"founding_year"},
-          {title:"Headquarters", field:"headquarters"},
-          {title:"Engineers", field:"employees.type.Engineering.count"},
-          {title:"Total", field:"employees.total"},
-          {title:"Avg Tenure", field:"employees.avg_tenure"},
-          {title:"1y Employee Growth", field:"employees.1y_growth", sorter:"number"},
-          {title:"2y Employee Growth", field:"employees.2y_growth", sorter:"number"},
-          {title:"Stack", field:"stack.Application and Data", width: 100},
-          {title:"Base Salary", field:"comp.base"},
-          {title:"Sign-on Bonus", field:"comp.Sign-on bonus"},
-          {title:"Stock Options", field:"comp.Stock options"},
-          {title:"RSUs", field:"comp.RSUs"},
-          {title:"Glassdoor Rating", field:"glassdoor_rating.total", formatter:"star"},
-          {title:"Glassdoor Software Rating", field:"glassdoor_rating.software", formatter:"star"},
-       	],
-       	rowClick:function(e, row){ //trigger an alert message when the row is clicked
-       		alert("Row " + row.getData().id + " Clicked!!!!");
-       	},
+          {//create column group
+            title:"Employees",
+            columns:[
+              {title:"Engineers", field:"employees.type.Engineering.count"},
+              {title:"Total", field:"employees.total"},
+              {title:"Avg Tenure", field:"employees.avg_tenure"},
+              {title:"1y Growth", field:"employees.1y_growth", sorter:"number"},
+              {title:"2y Growth", field:"employees.2y_growth", sorter:"number"},
+            ],
+          },
+          {//create column group
+            title:"Compensation",
+            columns:[
+              {title:"Base Salary", field:"comp.base"},
+              {title:"Sign-on Bonus", field:"comp.Sign-on bonus"},
+              {title:"Stock Options", field:"comp.Stock options"},
+              {title:"RSUs", field:"comp.RSUs"},
+            ],
+          },
+          {//create column group
+            title:"Glassdoor Rating",
+            columns:[
+              {title:"General", field:"glassdoor_rating.total"},
+              {title:"Software", field:"glassdoor_rating.software"},
+            ],
+          },
+          {title:"Stack", field:"stack.Application and Data"},
+        ],
+       	// rowClick:function(e, row){ //trigger an alert message when the row is clicked
+       	// 	alert("Row " + row.getData() + " Clicked!!!!");
+       	// },
       });
     }
   </script>
@@ -43,27 +59,4 @@
 {% block body %}
 <!-- <div>Hell</div> -->
 <div id="example-table"></div>
-  <!-- <table>
-    <caption>Comparing Tech Companies for New Grads</caption>
-    <colgroup>
-        <col class="week"/>
-        <col class="player"/>
-        <col class="club"/>
-        <col class="stat"/>
-    </colgroup>
-    <tr>
-      <th>Company</th>
-      <th>Salary</th>
-    </tr>
-  {% for company in companies %}
-    <tr>
-      <td>{{company.company}}</td>
-      {% if company.comp is defined %} 
-        <td>{{company.comp.base}}</td>
-      {% else %}
-        <td></td>
-      {% endif %}
-    </tr>
-  {% endfor %}
-  </table> -->
 {% endblock %}

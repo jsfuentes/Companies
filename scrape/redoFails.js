@@ -32,7 +32,9 @@ async function redoScrape() {
   const secrets = await utils.readSecrets(); 
   const dbData = await utils.connectToData(secrets);
 
-  const companyDocs = await dbData.find().toArray();
+  //Use below line to choose specific companies to redo
+  // const companyDocs = await dbData.find({'company': 'uber'}).toArray();
+  const companyDocs = await dbData.find({'company': 'snap-inc'}).toArray();
   for(let i = 0; i < companyDocs.length; i++) {
     const oldData = companyDocs[i];
     const name = oldData.company;

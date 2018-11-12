@@ -36,6 +36,10 @@ module.exports = class LinkedinCompany extends Scrapper {
     
     const descriptionS = '.org-about-us-organization-description__text';
     await this.page.waitForSelector(descriptionS);
+    await utils.randomDelay();
+    await this.scrollPage();
+    await this.page.waitForSelector('.org-function-growth-table'); //this only appears after a page scroll
+    
     try {
       this.data['description'] = await this.page.$eval(descriptionS, x => x.innerText.trim());
     } catch(e) {
@@ -62,11 +66,7 @@ module.exports = class LinkedinCompany extends Scrapper {
       console.log('headquarters fail:', e);
     } 
     
-    await utils.randomDelay();
-    await this.scrollPage();
-
     //Employees
-    await this.page.waitForSelector('.org-function-growth-table');
     try {
       this.data['employees'] = await this.page.evaluate(() => {
         const table = document.querySelector('.org-insights-module__summary-table');
