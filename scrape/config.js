@@ -26,6 +26,7 @@ module.exports = {
   COMPANY_LIST: [
     "affirm",
     "airbnb",
+    "airtable",
     "amazon",
     "apple",
     "asana",
@@ -34,6 +35,7 @@ module.exports = {
     "brex",
     "box",
     "clover-health",
+    "cloudera",
     "coursera",
     "coinbase",
     "convoy",
@@ -53,6 +55,7 @@ module.exports = {
     "lyft",
     "medium",
     "microsoft",
+    "nuro",
     // "neuralink",
     "palantir-technologies",
     "paypal",

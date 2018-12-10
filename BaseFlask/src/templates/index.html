@@ -9,7 +9,6 @@
   <script>
     //define some sample data
      var tabledata = {{ companies|tojson }};
-     console.log(tabledata);
       //create Tabulator on DOM element with id "example-table"
     window.onload = function(){
       var table = new Tabulator("#example-table", {
@@ -31,12 +30,12 @@
             ],
           },
           {//create column group
-            title:"Compensation",
+            title:"New Grad Compensation",
             columns:[
-              {title:"Base Salary", field:"comp.base"},
-              {title:"Sign-on Bonus", field:"comp.Sign-on bonus"},
-              {title:"Stock Options", field:"comp.Stock options"},
+              {title:"Base", field:"comp.base"},
+              {title:"Options", field:"comp.Stock options"},
               {title:"RSUs", field:"comp.RSUs"},
+              {title:"Sign-on", field:"comp.Sign-on bonus"},
             ],
           },
           {//create column group
@@ -57,6 +56,5 @@
 {% endblock %}
 
 {% block body %}
-<!-- <div>Hell</div> -->
 <div id="example-table"></div>
 {% endblock %}

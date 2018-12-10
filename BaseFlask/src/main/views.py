@@ -8,6 +8,4 @@ main = Blueprint('main', __name__)
 def index():
     companies = list(company_collection.find({}, {'_id':0}))
     companies.sort(key=lambda x: x['company'])
-    print(companies[:3])
-    print(json.dumps(companies[:3]))
     return render_template("index.html", companies=companies)
