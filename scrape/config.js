@@ -52,6 +52,7 @@ module.exports = {
     "instacart",
     "lemonade",
     "linkedin",
+    "lululemon",
     "lyft",
     "medium",
     "microsoft",
